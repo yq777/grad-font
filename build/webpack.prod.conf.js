@@ -117,4 +117,15 @@ if (config.build.bundleAnalyzerReport) {
   webpackConfig.plugins.push(new BundleAnalyzerPlugin())
 }
 
+if (config.build.productionZip) {
+  var ZipPlugin = require('zip-webpack-plugin')
+
+  webpackConfig.plugins.push(
+    new ZipPlugin({
+      path:path.join(__dirname,'../'),
+      filename: 'dist.zip'
+    })
+  )
+}
+
 module.exports = webpackConfig

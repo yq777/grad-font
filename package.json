@@ -2,7 +2,7 @@
   "name": "ruochu-fd-framework",
   "version": "1.0.0",
   "description": "若初前端基本框架",
-  "author": "Nic Chan <e_ycchen@126.com>",
+  "author": "Nic Chan <yucai@ruochuyizhu.com>",
   "private": true,
   "scripts": {
     "dev": "node build/dev-server.js",
