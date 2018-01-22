@@ -1,10 +1,30 @@
-var path = require('path')
-var utils = require('./utils')
-var config = require('../config')
-var vueLoaderConfig = require('./vue-loader.conf')
+var path = require('path');
+var chalk = require('chalk')
+var utils = require('./utils');
+var config = require('../config');
+var vueLoaderConfig = require('./vue-loader.conf');
+var HappyPack = require('happypack');
+var os = require('os')
+var happyThreadPool = HappyPack.ThreadPool({size: os.cpus().length});
+var ProgressBarPlugin = require('progress-bar-webpack-plugin')
 
-function resolve (dir) {
-  return path.join(__dirname, '..', dir)
+function resolve(dir) {
+  return path.join(__dirname, '..', dir);
+}
+
+// inject happypack accelerate packing for vue-loader @17-08-18
+Object.assign(vueLoaderConfig.loaders, {
+  js: 'happypack/loader?id=happy-babel-vue'
+})
+
+function createHappyPlugin(id, loaders) {
+  return new HappyPack({
+    id: id,
+    loaders: loaders,
+    threadPool: happyThreadPool,
+    // make happy more verbose with HAPPY_VERBOSE=1
+    verbose: process.env.HAPPY_VERBOSE === '1'
+  })
 }
 
 module.exports = {
@@ -22,7 +42,10 @@ module.exports = {
     extensions: ['.js', '.vue', '.json'],
     alias: {
       'vue$': 'vue/dist/vue.esm.js',
-      '@': resolve('src')
+      '@': resolve('src'),
+      'api': resolve('src/api'),
+      'components': resolve('src/components'),
+      'utils': resolve('src/utils')
     }
   },
   module: {
@@ -32,6 +55,7 @@ module.exports = {
         loader: 'eslint-loader',
         enforce: 'pre',
         include: [resolve('src'), resolve('test')],
+        exclude: /node_modules/,
         options: {
           formatter: require('eslint-friendly-formatter')
         }
@@ -39,12 +63,15 @@ module.exports = {
       {
         test: /\.vue$/,
         loader: 'vue-loader',
+        include: [resolve('src')],
         options: vueLoaderConfig
       },
       {
         test: /\.js$/,
-        loader: 'babel-loader',
-        include: [resolve('src'), resolve('test')]
+        // loader: 'babel-loader?cacheDirectory=true',
+        loader: 'happypack/loader?id=happy-babel-js',
+        include: [resolve('src'), resolve('test')],
+        exclude: /node_modules/
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
@@ -63,5 +90,22 @@ module.exports = {
         }
       }
     ]
-  }
-}
+  },
+  plugins: [
+    new ProgressBarPlugin({
+      format: '  build [:bar] ' + chalk.green.bold(':percent') + ' (:elapsed seconds)'
+    }),
+    createHappyPlugin('happy-babel-js', ['babel-loader?cacheDirectory=true']),
+    createHappyPlugin('happy-babel-vue', ['babel-loader?cacheDirectory=true']),
+    new HappyPack({
+      loaders: [{
+        path: 'vue-loader',
+        query: {
+          loaders: {
+            less: 'vue-style-loader!css-loader!less-loader?indentedSyntax'
+          }
+        }
+      }]
+    })
+  ]
+};
