@@ -5,19 +5,19 @@
 </template>
 
 <script>
-export default {
-  name: 'hello',
-  data () {
-    return {
-      msg: 'Ruochu Frontend Framework'
+  export default {
+    name: 'hello',
+    data() {
+      return {
+        msg: '零食销售前端'
+      }
     }
   }
-}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h1, h2 {
-  font-weight: normal;
-}
+  h1, h2 {
+    font-weight: normal;
+  }
 </style>
