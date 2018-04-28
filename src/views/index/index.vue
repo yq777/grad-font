@@ -1,112 +1,54 @@
 <template>
   <div class="index-page">
     <title-content></title-content>
-    <nav-content></nav-content>
-    <el-row :gutter="32">
-      <el-col :span="4">
-        <el-menu class="m_menu" backgroundColor="#e6e6e6">
-          <el-menu-item index="1" style="padding-left: 0" @click="goToGoodsList">
-            <i class="el-icon-menu"></i>
-            <span slot="title">坚果炒货</span>
-            <i class="el-icon-arrow-right arrow-right"></i>
-          </el-menu-item>
-          <el-menu-item index="2" style="padding-left: 0">
-            <i class="el-icon-menu"></i>
-            <span slot="title">糖果巧克力</span>
-            <i class="el-icon-arrow-right arrow-right"></i>
-          </el-menu-item>
-          <el-menu-item index="3" style="padding-left: 0">
-            <i class="el-icon-menu"></i>
-            <span slot="title">无糖食品</span>
-            <i class="el-icon-arrow-right arrow-right"></i>
-          </el-menu-item>
-          <el-menu-item index="4" style="padding-left: 0">
-            <i class="el-icon-menu"></i>
-            <span slot="title">休闲食品</span>
-            <i class="el-icon-arrow-right arrow-right"></i>
-          </el-menu-item>
-          <el-menu-item index="5" style="padding-left: 0">
-            <i class="el-icon-menu"></i>
-            <span slot="title">肉干肉脯</span>
-            <i class="el-icon-arrow-right arrow-right"></i>
-          </el-menu-item>
-          <el-menu-item index="6" style="padding-left: 0">
-            <i class="el-icon-menu"></i>
-            <span slot="title">饼干蛋糕</span>
-            <i class="el-icon-arrow-right arrow-right"></i>
-          </el-menu-item>
-          <el-menu-item index="7" style="padding-left: 0">
-            <i class="el-icon-menu"></i>
-            <span slot="title">蜜饯果干</span>
-            <i class="el-icon-arrow-right arrow-right"></i>
-          </el-menu-item>
-        </el-menu>
-      </el-col>
-      <el-col :span="20">
-        <el-carousel height="392px" trigger="click" class="u_carousel">
-          <el-carousel-item v-for="item in 4" :key="item">
-            <h3 style="line-height: 392px;text-align: center">{{ item }}</h3>
-          </el-carousel-item>
-        </el-carousel>
-      </el-col>
-    </el-row>
+    <img src="~assets/logo.png" width="170px" @click="goToIndex">
+    <div class="g-menu">
+      <el-menu class="m_menu" backgroundColor="#e6e6e6" v-loading="menuLoading">
+        <el-menu-item :index="index.toString()" style="padding-left: 0" @click="goToGoodsList(item)" v-for="(item,index) in categoryList" :key="item.id">
+          <i class="el-icon-menu"></i>
+          <span slot="title">{{item.name}}</span>
+        </el-menu-item>
+      </el-menu>
+      <el-carousel trigger="click" type="card" class="u_carousel">
+        <el-carousel-item style="text-align: center;margin-top: 20px;" v-for="item in hotList" :key="item.id">
+          <img :src="`${imageUrl}${item.mainImage}`" width="300" height="300" @click="goToProductDetail(item)">
+        </el-carousel-item>
+      </el-carousel>
+    </div>
     <div class="g_recommend">
-      <div class="g_recommend_item">
-        <div class="u_title"><i class="el-icon-menu"></i> 坚果炒货</div>
-        <ul class="m_li_wrap">
-          <li class="m_image_wrap" v-for="item in 5" :key="item">
-            <img src=""/>
-          </li>
-        </ul>
-      </div>
-      <div class="g_recommend_item">
-        <div class="u_title"><i class="el-icon-menu"></i> 糖果巧克力</div>
-        <ul class="m_li_wrap">
-          <li class="m_image_wrap" v-for="item in 5" :key="item">
-            <img src=""/>
-          </li>
-        </ul>
-      </div>
-      <div class="g_recommend_item">
-        <div class="u_title"><i class="el-icon-menu"></i> 无糖食品</div>
-        <ul class="m_li_wrap">
-          <li class="m_image_wrap" v-for="item in 5" :key="item">
-            <img src=""/>
-          </li>
-        </ul>
-      </div>
-      <div class="g_recommend_item">
-        <div class="u_title"><i class="el-icon-menu"></i> 休闲食品</div>
-        <ul class="m_li_wrap">
-          <li class="m_image_wrap" v-for="item in 5" :key="item">
-            <img src=""/>
-          </li>
-        </ul>
-      </div>
-      <div class="g_recommend_item">
-        <div class="u_title"><i class="el-icon-menu"></i> 肉干肉脯</div>
-        <ul class="m_li_wrap">
-          <li class="m_image_wrap" v-for="item in 5" :key="item">
-            <img src=""/>
-          </li>
-        </ul>
-      </div>
-      <div class="g_recommend_item">
-        <div class="u_title"><i class="el-icon-menu"></i> 饼干蛋糕</div>
-        <ul class="m_li_wrap">
-          <li class="m_image_wrap" v-for="item in 5" :key="item">
-            <img src=""/>
-          </li>
-        </ul>
-      </div>
-      <div class="g_recommend_item">
-        <div class="u_title"><i class="el-icon-menu"></i> 蜜饯果干</div>
-        <ul class="m_li_wrap">
-          <li class="m_image_wrap" v-for="item in 5" :key="item">
-            <img src=""/>
-          </li>
-        </ul>
-      </div>
+      <template v-for="item in productList">
+        <div class="g_recommend_item" v-if="item.list.length > 0">
+          <div class="u_title"><i class="el-icon-menu"></i> {{item.name}}</div>
+          <ul class="m_li_wrap">
+            <li class="m_image_wrap" v-if="item.list.length > 5" v-for="product in (item.list.slice(0,5))" :key="product.id" @click="goToProductDetail(product)">
+              <div style="text-align: center">
+                <img :src="`${imageUrl}${product.mainImage}`" width="157"/>
+              </div>
+              <div class="m-info">
+                <div class="u-price">￥{{product.price}}</div>
+                <div class="u-name">{{product.name}}</div>
+                <div class="m-stock">
+                  <span>库存：{{product.stock}}</span>
+                  <span>销售量：{{product.saleStock}}</span>
+                </div>
+              </div>
+            </li>
+            <li class="m_image_wrap" v-if="item.list.length < 5" v-for="product in item.list" :key="product.id" @click="goToProductDetail(product)">
+              <div style="text-align: center">
+                <img class="u-img" :src="`${imageUrl}${product.mainImage}`"/>
+              </div>
+              <div class="m-info">
+                <div class="u-price">￥{{product.price}}</div>
+                <div class="u-name">{{product.name}}</div>
+                <div class="m-stock">
+                  <span>库存：{{product.stock}}</span>
+                  <span>销售量：{{product.saleStock}}</span>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </template>
     </div>
   </div>
 </template>
@@ -114,6 +56,12 @@
 <script>
   import TitleContent from '../common/title.vue';
   import NavContent from '../common/nav.vue';
+  import StorageUtils from "../../utils/StorageUtils";
+  import {getIndexCategory} from "../../service/category";
+  import PagerModel from "../../model/pager";
+  import {getFontProducts} from "../../service/product";
+  import {imageUrl} from "../../config/config"
+  import ObjectUtils from "../../utils/ObjectUtils";
 
   export default {
     components: {
@@ -121,14 +69,68 @@
       NavContent
     },
     data() {
-      return {}
+      return {
+        menuLoading: false,
+        categoryList: [],
+        productList: [],
+        hotList: [],
+        pager: new PagerModel(),
+        imageUrl
+      }
     },
     created() {
+      this.getCategoryList();
+      this.getHotProductList();
     },
     methods: {
-      goToGoodsList() {
+      goToGoodsList(item) {
+        StorageUtils.set("category", item);
         this.$router.push({
           name: 'GoodsList'
+        })
+      },
+      getCategoryList() {
+        let patientId = 0;
+        this.menuLoading = true;
+        getIndexCategory(patientId).then(res => {
+          this.categoryList = res.data;
+          this.productList = [];
+          this.categoryList.forEach(item => {
+            let keyword = '';
+            let orderBy = 'sale_stock_desc';
+            getFontProducts(this.pager.pageSize, this.pager.nowPage, keyword, item.id, orderBy).then(rs => {
+              let data = {
+                ...item,
+                list: rs.data.list
+              };
+              this.productList.push(data);
+            })
+          });
+          this.menuLoading = false;
+        })
+      },
+      goToIndex() {
+        this.$router.push({
+          name: "Index"
+        })
+      },
+      goToProductDetail(val) {
+        let product = ObjectUtils.deepCopy(val);
+        StorageUtils.set("product", product);
+        this.$router.push({
+          name: 'GoodsDetail'
+        })
+      },
+      getHotProductList() {
+        let keyword = '';
+        let orderBy = 'sale_stock_desc';
+        let categoryId = -1;
+        getFontProducts(this.pager.pageSize, this.pager.nowPage, keyword, categoryId, orderBy).then(res => {
+          if (res.data.list.length > 4) {
+            this.hotList = res.data.list.slice(0, 4);
+          } else {
+            this.hotList = res.data.list;
+          }
         })
       }
     }
@@ -138,23 +140,26 @@
 <style lang="less">
   .index-page {
     padding-bottom: 10px;
-    .m_menu {
-      width: 170px;
-
-      .el-menu-item {
-        position: relative;
-        font-size: 17px;
-        .arrow-right {
-          position: absolute;
-          top: 50%;
-          right: 5px;
-          margin-top: -9px;
+    .g-menu {
+      display: flex;
+      .m_menu {
+        flex: 0 0 170px;
+        .el-menu-item {
+          position: relative;
+          font-size: 17px;
+          .arrow-right {
+            position: absolute;
+            top: 50%;
+            right: 5px;
+            margin-top: -9px;
+          }
         }
       }
-    }
-    .u_carousel {
-      width: 80%;
-      background-color: #cccccc;
+      .u_carousel {
+        flex: 0 0 80%;
+        margin-left: 50px;
+        background-color: #cccccc;
+      }
     }
     .g_recommend {
       .g_recommend_item {
@@ -169,14 +174,33 @@
         .m_li_wrap {
           display: flex;
           flex-direction: row;
-          justify-content: space-between;
         }
         .m_image_wrap {
           flex: 0 0 19%;
+          display: flex;
+          flex-direction: column;
           height: 250px;
           margin-top: 15px;
+          padding: 10px;
           margin-right: 15px;
           background-color: #FFF;
+          .u-img {
+            height: 157px;
+          }
+          .m-info {
+            .u-price {
+              font-size: 16px;
+              color: #e7380d;
+            }
+            .u-name {
+              font-size: 15px;
+              line-height: 1.5;
+            }
+            .m-stock {
+              font-size: 13px;
+              color: #666;
+            }
+          }
         }
         .m_image_wrap:hover {
           cursor: pointer;

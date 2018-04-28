@@ -2,33 +2,43 @@
   <div class="about-us-page">
     <title-content></title-content>
     <nav-content></nav-content>
-    <el-tabs class="m_tabs" v-model="activeName">
+    <el-tabs class="m_tabs" v-model="activeName" @select="changeTab">
       <el-tab-pane label="个人中心" name="userCenter">
         <div>
           <div class="u_my_info_title">我的信息</div>
           <el-form label-width="90px" class="m_form" v-show="!editInfoShow">
-            <el-form-item style="padding-top: 10px" label="用户名："></el-form-item>
-            <el-form-item label="电话："></el-form-item>
-            <el-form-item label="邮箱："></el-form-item>
-            <el-form-item label="密保问题："></el-form-item>
-            <el-form-item label="密保答案："></el-form-item>
+            <el-form-item style="padding-top: 10px" label="用户名：">
+              <span>{{userInfo ? userInfo.username : ''}}</span>
+            </el-form-item>
+            <el-form-item label="电话：">
+              <span>{{userInfo ? userInfo.phone : ''}}</span>
+            </el-form-item>
+            <el-form-item label="邮箱：">
+              <span>{{userInfo ? userInfo.email : ''}}</span>
+            </el-form-item>
+            <el-form-item label="密保问题：">
+              <span>{{userInfo ? userInfo.question : ''}}</span>
+            </el-form-item>
+            <el-form-item label="密保答案：">
+              <span>{{userInfo ? userInfo.answer : ''}}</span>
+            </el-form-item>
             <el-button class="u_edit_button" @click="updateInfo">编辑</el-button>
           </el-form>
           <el-form label-width="90px" class="m_form" v-show="editInfoShow">
             <el-form-item style="padding-top: 10px" label="用户名：">
-              <el-input style="width: 80%" placeholder="请输入用户名"></el-input>
+              <span>{{userInfo.username}}</span>
             </el-form-item>
             <el-form-item label="电话：">
-              <el-input style="width: 80%" placeholder="请输入电话号码"></el-input>
+              <el-input style="width: 80%" placeholder="请输入电话号码" v-model="userInfo.phone"></el-input>
             </el-form-item>
             <el-form-item label="邮箱：">
-              <el-input style="width: 80%" placeholder="请输入邮箱"></el-input>
+              <el-input style="width: 80%" placeholder="请输入邮箱" v-model="userInfo.email"></el-input>
             </el-form-item>
             <el-form-item label="密保问题：">
-              <el-input style="width: 80%" placeholder="请输入密保问题"></el-input>
+              <el-input style="width: 80%" placeholder="请输入密保问题" v-model="userInfo.question"></el-input>
             </el-form-item>
             <el-form-item label="密保答案：">
-              <el-input style="width: 80%" placeholder="请输入密保答案"></el-input>
+              <el-input style="width: 80%" placeholder="请输入密保答案" v-model="userInfo.answer"></el-input>
             </el-form-item>
             <el-button class="u_edit_button" @click="update">修改</el-button>
           </el-form>
@@ -42,13 +52,13 @@
           <div class="u_my_info_title">修改密码</div>
           <el-form label-width="90px" class="m_form">
             <el-form-item style="padding-top: 10px" label="原始密码：">
-              <el-input style="width: 80%" placeholder="请输入原始密码"></el-input>
+              <el-input style="width: 80%" type="password" placeholder="请输入原始密码" v-model="passwordOld"></el-input>
             </el-form-item>
             <el-form-item label="新密码：">
-              <el-input style="width: 80%" placeholder="请输入新密码"></el-input>
+              <el-input style="width: 80%" type="password" placeholder="请输入新密码" v-model="passwordNew"></el-input>
             </el-form-item>
             <el-form-item label="确认密码：">
-              <el-input style="width: 80%" placeholder="请输入新密码"></el-input>
+              <el-input style="width: 80%" type="password" placeholder="请输入新密码" v-model="confirmPassword"></el-input>
             </el-form-item>
             <el-button class="u_edit_button" @click="updatePassword">提交</el-button>
           </el-form>
@@ -64,6 +74,9 @@
   import NavContent from '../common/nav.vue';
   import TitleContent from '../common/title.vue';
   import Orders from '../order/order.vue';
+  import {getUserInfo, resetPassword, updateUserInfo} from "../../service/user";
+  import StringUtils from "../../utils/StringUtils";
+  import StorageUtils from "../../utils/StorageUtils";
 
   export default {
     components: {
@@ -75,25 +88,62 @@
       return {
         activeName: 'userCenter',
         editInfoShow: false,
-        path: ''
+        path: '',
+        passwordOld: '',
+        passwordNew: '',
+        confirmPassword: '',
+        userInfo: {}
       }
     },
     created() {
       let path = this.$route.path;
-      console.log(path);
       this.activeName = /myOrder/.test(path) ? 'myOrders' : 'userCenter';
+      this.userInfo = StorageUtils.get("userInfo");
     },
     methods: {
       updateInfo() {
         this.editInfoShow = true;
       },
       update() {
-        this.editInfoShow = false;
+        let user = {
+          id: this.userInfo.id,
+          username: this.userInfo.username,
+          password: this.userInfo.password,
+          email: this.userInfo.email,
+          phone: this.userInfo.phone,
+          question: this.userInfo.question,
+          answer: this.userInfo.answer,
+          role: this.userInfo.role
+        };
+        updateUserInfo(user).then(res => {
+          this.$message.success("修改信息成功");
+          StorageUtils.set("userInfo", res.data);
+          this.editInfoShow = false;
+        });
       },
       updatePassword() {
-        this.$message.success("修改密码成功");
-        this.$router.replace({
-          name: 'Login'
+        if (StringUtils.isBlank(this.passwordOld)) {
+          this.$message.error("请输入原始密码");
+          return false;
+        }
+        if (StringUtils.isBlank(this.passwordNew)) {
+          this.$message.error("请输入新密码");
+          return false;
+        }
+        if (this.passwordNew !== this.confirmPassword) {
+          this.$message.error("确认密码与新密码不一致");
+          return false;
+        }
+        resetPassword(this.passwordOld, this.passwordNew).then(() => {
+          this.$message.success("修改密码成功");
+          this.$router.replace({
+            name: 'Login'
+          })
+        });
+      },
+      changeTab(val) {
+        getUserInfo().then(() => {
+          this.$message.warning("用户未登录或登录过期");
         })
       }
     }

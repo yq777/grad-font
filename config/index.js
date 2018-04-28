@@ -30,11 +30,11 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
-      'back/api': {
+      '/api': {
         target: 'http://www.yq.com',
         changeOrigin: true,
         pathRewrite: {
-          '^back/api': 'back/api'
+          '^/api': '/api'
         }
       }
     },
