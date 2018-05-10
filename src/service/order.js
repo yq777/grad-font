@@ -11,3 +11,5 @@ export const concelOrder = (orderNo) => doPost("/api/order/cancel.do", {orderNo}
 export const getOrderList = (pageSize, nowPage) => doPost("/api/manage/order/list.do", {pageSize, nowPage});
 
 export const sendGoods = (orderNo) => doPost("/api/manage/order/send_goods.do", {orderNo});
+
+export const deleteOrder = (orderNo) => doPost("/api/order/delete.do", {orderNo});

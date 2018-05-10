@@ -5,7 +5,7 @@
       <el-table-column type="expand">
         <template slot-scope="scope">
           <el-table :data="scope.row.orderItemVoList" :show-header="false" header-align="center">
-            <el-table-column min-width="500">
+            <el-table-column min-width="300">
               <template slot-scope="props">
                 <div class="m-info">
                   <img class="u-img" :src="`${imageUrl}${props.row.productImage}`" width="100"/>
@@ -13,7 +13,7 @@
                 </div>
               </template>
             </el-table-column>
-            <el-table-column min-width="170">
+            <el-table-column>
               <template slot-scope="props">
                 <span class="m-info">{{props.row.currentUnitPrice}}</span>
               </template>
@@ -23,7 +23,7 @@
                 <span class="m-info">{{props.row.quantity}}</span>
               </template>
             </el-table-column>
-            <el-table-column>
+            <el-table-column min-width="100">
               <template slot-scope="props">
                 <span class="m-info">{{props.row.totalPrice}}</span>
               </template>
@@ -61,6 +61,11 @@
       </el-table-column>
       <el-table-column label="合计" align="center">
       </el-table-column>
+      <el-table-column label="操作" align="center">
+        <template slot-scope="scope">
+          <el-button type="text" @click="_deleteOrder(scope.row)">删除</el-button>
+        </template>
+      </el-table-column>
     </el-table>
     <el-pagination
       class="m-page"
@@ -74,7 +79,7 @@
 
 <script>
   import PagerModel from "../../model/pager";
-  import {concelOrder, searchUserOrder} from "../../service/order";
+  import {concelOrder, deleteOrder, searchUserOrder} from "../../service/order";
   import {imageUrl} from "../../config/config";
   import StorageUtils from "../../utils/StorageUtils";
 
@@ -120,6 +125,16 @@
             this.getOrderList();
           });
         });
+      },
+      _deleteOrder(val) {
+        this.$confirm("该操作将删除您所选中的订单，是否继续？", "提示", {
+          type: "warning"
+        }).then(() => {
+          deleteOrder(val.orderNo).then(() => {
+            this.$message("删除成功");
+            this.getOrderList();
+          })
+        })
       }
     }
   }
@@ -136,6 +151,9 @@
       font-weight: 700;
       color: #666;
       text-align: center;
+    }
+    .u-button {
+      margin: 10px;
     }
     .m_goods_message {
       height: 40px;

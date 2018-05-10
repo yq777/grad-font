@@ -9,7 +9,7 @@
       <el-row :gutter="16" class="g_goods_detail">
         <el-col :span="8" class="m_img">
           <div class="u_img_large">
-            <img ref="img" :src="`${imageUrl}${productDetail.mainImage}`"/>
+            <img width="300px" ref="img" :src="`${imageUrl}${productDetail.mainImage}`"/>
           </div>
           <div class="u_img_small">
             <img v-for="item in subImages" :src="`${imageUrl}${item}`" :class="{active:item === currentImg}" style="margin-right: 10px" height="50" @mouseover="changeImage(item)"/>

@@ -25,7 +25,7 @@
           <el-table-column label="单价" prop="productPrice" align="center"></el-table-column>
           <el-table-column label="数量" prop="quantity" align="center">
             <template slot-scope="scope">
-              <el-input-number :min="1" controls-position="right" v-model="scope.row.quantity" @change="changeNum(scope.row)"></el-input-number>
+              <el-input-number :min="1" :max="scope.row.productStock" controls-position="right" v-model="scope.row.quantity" @change="changeNum(scope.row)"></el-input-number>
             </template>
           </el-table-column>
           <el-table-column label="合计" prop="productTotalPrice" align="center"></el-table-column>
@@ -115,9 +115,14 @@
       deleteProducts() {
         let productIds = this.multipleSelection.map(m => m.productId);
         productIds = productIds.join(",");
-        deleteProducts(productIds).then(res => {
-          this.getProductList();
-        })
+        this.$confirm("该操作将会删除您所选中的所有商品，是否继续？", "提示", {
+          type: "warning"
+        }).then(() => {
+          deleteProducts(productIds).then(res => {
+            this.$message.success("删除成功");
+            this.getProductList();
+          })
+        });
       },
       goToConfirm() {
         if (ArrayUtils.isNullOrEmpty(this.multipleSelection)) {

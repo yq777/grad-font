@@ -90,6 +90,7 @@
           type: 'warning'
         }).then(() => {
           Logout().then(() => {
+            this.$message.success("退出成功");
             this.$router.replace({
               name: 'Login'
             })

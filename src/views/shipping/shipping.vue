@@ -87,6 +87,7 @@
   import {imageUrl} from '../../config/config';
   import {getCheckedProductList} from "../../service/cart";
   import {createOrder, pay} from "../../service/order";
+  import StringUtils from "../../utils/StringUtils";
 
   export default {
     components: {
@@ -150,9 +151,11 @@
         model = new AddressModel().map(model);
         if (model.verify()) {
           let pattern = /^[1-9][0-9]{5}$/;
-          if (!pattern.test(model.receiverZip)) {
-            this.$message.error("请输入正确的邮编");
-            return false;
+          if (!StringUtils.isBlank(model.receiverZip)) {
+            if (!pattern.test(model.receiverZip)) {
+              this.$message.error("请输入正确的邮编");
+              return false;
+            }
           }
           this.confirmLoading = true;
           if (this.model.type === 'add') {

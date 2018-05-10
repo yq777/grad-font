@@ -4,7 +4,7 @@
     <nav-content></nav-content>
     <div class="m-content">
       <div class="u-title">
-        <div>订单生成成功，请及时支付，订单号：{{payInfo.orderNo}}</div>
+        <div>订单生成成功，请及时支付(二维码有效期为2小时，如若超时请取消订单，如若想购买该商品请重新下单)，订单号：{{payInfo.orderNo}}</div>
         <div style="color: #DF3033;font-weight: 600">请用支付宝扫描下方二维码进行支付</div>
       </div>
       <img :src="payInfo.qrUrl"/>

@@ -24,20 +24,20 @@
             </el-form-item>
             <el-button class="u_edit_button" @click="updateInfo">编辑</el-button>
           </el-form>
-          <el-form label-width="90px" class="m_form" v-show="editInfoShow">
+          <el-form label-width="100px" class="m_form" v-show="editInfoShow">
             <el-form-item style="padding-top: 10px" label="用户名：">
               <span>{{userInfo.username}}</span>
             </el-form-item>
-            <el-form-item label="电话：">
+            <el-form-item label="电话：" required>
               <el-input style="width: 80%" placeholder="请输入电话号码" v-model="userInfo.phone"></el-input>
             </el-form-item>
-            <el-form-item label="邮箱：">
+            <el-form-item label="邮箱：" required>
               <el-input style="width: 80%" placeholder="请输入邮箱" v-model="userInfo.email"></el-input>
             </el-form-item>
-            <el-form-item label="密保问题：">
+            <el-form-item label="密保问题：" required>
               <el-input style="width: 80%" placeholder="请输入密保问题" v-model="userInfo.question"></el-input>
             </el-form-item>
-            <el-form-item label="密保答案：">
+            <el-form-item label="密保答案：" required>
               <el-input style="width: 80%" placeholder="请输入密保答案" v-model="userInfo.answer"></el-input>
             </el-form-item>
             <el-button class="u_edit_button" @click="update">修改</el-button>
@@ -50,14 +50,14 @@
       <el-tab-pane label="修改密码" name="updatePassword">
         <div>
           <div class="u_my_info_title">修改密码</div>
-          <el-form label-width="90px" class="m_form">
-            <el-form-item style="padding-top: 10px" label="原始密码：">
+          <el-form label-width="100px" class="m_form">
+            <el-form-item style="padding-top: 10px" label="原始密码：" required>
               <el-input style="width: 80%" type="password" placeholder="请输入原始密码" v-model="passwordOld"></el-input>
             </el-form-item>
-            <el-form-item label="新密码：">
+            <el-form-item label="新密码：" required>
               <el-input style="width: 80%" type="password" placeholder="请输入新密码" v-model="passwordNew"></el-input>
             </el-form-item>
-            <el-form-item label="确认密码：">
+            <el-form-item label="确认密码：" required>
               <el-input style="width: 80%" type="password" placeholder="请输入新密码" v-model="confirmPassword"></el-input>
             </el-form-item>
             <el-button class="u_edit_button" @click="updatePassword">提交</el-button>
@@ -77,6 +77,7 @@
   import {getUserInfo, resetPassword, updateUserInfo} from "../../service/user";
   import StringUtils from "../../utils/StringUtils";
   import StorageUtils from "../../utils/StorageUtils";
+  import MatcherUtils from "../../utils/MatcherUtils";
 
   export default {
     components: {
@@ -115,6 +116,30 @@
           answer: this.userInfo.answer,
           role: this.userInfo.role
         };
+        if (StringUtils.isBlank(user.phone)) {
+          this.$message.error("请输入手机号");
+          return false;
+        }
+        if (!MatcherUtils.isPhone(user.phone)) {
+          this.$message.error("请输入正确的手机号");
+          return false;
+        }
+        if (StringUtils.isBlank(user.email)) {
+          this.$message.error("请输入邮箱");
+          return false;
+        }
+        if (!MatcherUtils.isEmail(user.email)) {
+          this.$message.error("请输入正确的邮箱");
+          return false;
+        }
+        if (StringUtils.isBlank(user.question)) {
+          this.$message.error("请输入密保问题");
+          return false;
+        }
+        if (StringUtils.isBlank(user.answer)) {
+          this.$message.error("请输入密保答案");
+          return false;
+        }
         updateUserInfo(user).then(res => {
           this.$message.success("修改信息成功");
           StorageUtils.set("userInfo", res.data);
