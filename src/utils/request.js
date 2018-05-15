@@ -17,9 +17,9 @@ export const doPost = (url, params) => {
         resolve(res);
       } else {
         if (res.status === 10) {
-          Message.error(res.msg);
+          window.location.href = '/#/login';
           reject(res);
-        } else if (res.msg === "用户未登录或登录已过期") {
+        } else if (res.msg === "用户未登录,登录已过期") {
           reject(res);
         } else {
           Message.error(res.msg);

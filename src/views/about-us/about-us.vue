@@ -74,7 +74,7 @@
   import NavContent from '../common/nav.vue';
   import TitleContent from '../common/title.vue';
   import Orders from '../order/order.vue';
-  import {getUserInfo, resetPassword, updateUserInfo} from "../../service/user";
+  import {getUserInfomation, resetPassword, updateUserInfo} from "../../service/user";
   import StringUtils from "../../utils/StringUtils";
   import StorageUtils from "../../utils/StorageUtils";
   import MatcherUtils from "../../utils/MatcherUtils";
@@ -167,7 +167,7 @@
         });
       },
       changeTab(val) {
-        getUserInfo().then(() => {
+        getUserInfomation().then(() => {
           this.$message.warning("用户未登录或登录过期");
         })
       }
