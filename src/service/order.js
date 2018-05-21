@@ -13,3 +13,4 @@ export const getOrderList = (pageSize, nowPage) => doPost("/api/manage/order/lis
 export const sendGoods = (orderNo) => doPost("/api/manage/order/send_goods.do", {orderNo});
 
 export const deleteOrder = (orderNo) => doPost("/api/order/delete.do", {orderNo});
+export const confirmGetGood = (orderNo) => doPost("/api/order/confirm_get_goods.do", {orderNo});

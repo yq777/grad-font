@@ -28,7 +28,7 @@
       </el-form-item>
       <el-form-item label="商品图片" required>
         <img class="u-img" v-if="model.subImages.length > 0" :key="index" v-for="(item,index) in model.subImages" :src="`${imageUrl}${item}`">
-        <div class="pb-img-btn" @click.stop="handleClick">
+        <div v-show="model.subImages.length <7" class="pb-img-btn" @click.stop="handleClick">
           <slot>
             <el-button type="primary" plain>上传<i class="el-icon-upload el-icon--right"></i></el-button>
           </slot>

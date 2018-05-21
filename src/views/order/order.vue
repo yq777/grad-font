@@ -38,6 +38,9 @@
           <el-button type="primary" @click="goToPay(scope.row)" v-if="scope.row.status === 10" style="margin: 10px 0; float: right">
             去支付
           </el-button>
+          <el-button type="primary" @click="confirmGetGoods(scope.row)" v-if="scope.row.status === 40" style="margin: 10px 0; float: right">
+            确认收货
+          </el-button>
         </template>
       </el-table-column>
       <el-table-column label="商品信息" min-width="400" header-align="center">
@@ -63,7 +66,7 @@
       </el-table-column>
       <el-table-column label="操作" align="center">
         <template slot-scope="scope">
-          <el-button type="text" v-show="scope.row.status !== 10" @click="_deleteOrder(scope.row)">删除</el-button>
+          <el-button type="text" v-show="scope.row.status === 50 || scope.row.status === 0" @click="_deleteOrder(scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -79,7 +82,7 @@
 
 <script>
   import PagerModel from "../../model/pager";
-  import {concelOrder, deleteOrder, searchUserOrder} from "../../service/order";
+  import {concelOrder, confirmGetGood, deleteOrder, searchUserOrder} from "../../service/order";
   import {imageUrl} from "../../config/config";
   import StorageUtils from "../../utils/StorageUtils";
 
@@ -132,6 +135,15 @@
         }).then(() => {
           deleteOrder(val.orderNo).then(() => {
             this.$message("删除成功");
+            this.getOrderList();
+          })
+        })
+      },
+      confirmGetGoods(item) {
+        this.$confirm("确认收货？", "提示", {
+          type: "warning"
+        }).then(() => {
+          confirmGetGood(item.orderNo).then(res => {
             this.getOrderList();
           })
         })
